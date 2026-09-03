@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>상품 등록 · BoxingStore 관리자</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css">
+
+<style>
+/* ─────────── 토큰 ─────────── */
+:root{
+  /* 브랜드 */
+  --primary:#5865f2;
+  --primary-deep:#3d49c9;
+  --green:#35ed7e;
+  --magenta:#ec48bd;
+  --link:#00b0f4;
+
+  /* 표면 */
+  --canvas:#0a0d3a;
+  --surface:#1e2353;
+  --surface-hi:#272d63;
+  --onyx:#23272a;
+
+  /* 글자 */
+  --ink:#ffffff;
+  --ink-70:rgba(255,255,255,.74);
+  --ink-45:rgba(255,255,255,.58);
+  --ink-dark:#000000;
+
+  /* 상태 */
+  --danger:#ff6b81;
+
+  /* 간격 (8px 기준) */
+  --s-xxs:4px; --s-xs:8px; --s-sm:12px; --s-md:16px;
+  --s-lg:20px; --s-xl:24px; --s-xxl:32px; --s-sec:40px;
+
+  /* 모서리 잠금 규칙: 컨트롤 12, 카드 16, 패널 40, 배지와 칩 pill */
+  --r-ctl:12px; --r-card:16px; --r-panel:40px; --r-pill:999px;
+
+  /* 글꼴 */
+  --display:'Hanken Grotesk','Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --body:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --mono:'JetBrains Mono','D2Coding',ui-monospace,'Pretendard Variable',monospace;
+
+  --side:224px;
+}
+
+/* ─────────── 리셋 ─────────── */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--canvas); color:var(--ink);
+  font-family:var(--body); font-size:15px; line-height:1.65;
+  word-break:keep-all; overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased;
+  min-height:100dvh;
+}
+
+/* 브라우저가 그리는 표면도 팔레트에서 가져온다 */
+::selection{background:var(--primary);color:#fff}
+input,textarea{caret-color:#fff}
+*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.22) transparent}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border:3px solid transparent;
+  background-clip:content-box;border-radius:var(--r-pill)}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.34);border:3px solid transparent;
+  background-clip:content-box}
+.num,.cellin,.rrow__p,.navrow__n,.tfoot__sum b,.pcard__opt{font-variant-numeric:tabular-nums}
+h1,h2,h3,p,ul,ol,figure{margin:0}
+ul{list-style:none;padding:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--link)}
+img{max-width:100%;display:block}
+
+:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:4px}
+
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ─────────── 배경 그라디언트 메시 ─────────── */
+.mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.mesh span{position:absolute;display:block;border-radius:50%;filter:blur(110px);opacity:.42;
+  animation:drift 32s ease-in-out infinite alternate;will-change:transform}
+.mesh .m1{width:52vw;height:52vw;background:var(--primary);top:-14vw;left:-8vw}
+.mesh .m2{width:44vw;height:44vw;background:var(--magenta);top:34vh;right:-12vw;animation-duration:41s;animation-direction:alternate-reverse}
+.mesh .m3{width:38vw;height:38vw;background:#7b2ff7;bottom:-16vw;left:26vw;animation-duration:47s}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(5vw,-4vh,0) scale(1.18)}}
+
+/* ─────────── 셸 ─────────── */
+.shell{position:relative;z-index:1;display:grid;
+  grid-template-columns:var(--side) minmax(0,1fr);
+  min-height:100dvh}
+
+/* 사이드바 */
+.side{background:rgba(10,13,58,.66);backdrop-filter:blur(14px);
+  border-right:1px solid rgba(255,255,255,.06);padding:var(--s-lg) var(--s-sm);
+  display:flex;flex-direction:column;gap:var(--s-lg)}
+.side__store{display:flex;align-items:center;gap:10px;padding:0 var(--s-xs)}
+.side__mark{flex:none;width:36px;height:36px;border-radius:var(--r-pill);background:var(--primary);
+  display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:14px;color:#fff}
+.side__store div{min-width:0}
+.side__store b{display:block;font-family:var(--display);font-size:16px;letter-spacing:-.01em;line-height:1.3}
+.side__store small{color:var(--ink-45);font-size:12.5px}
+.side__group{display:flex;flex-direction:column;gap:2px}
+.side__cap{font-size:11.5px;font-weight:700;letter-spacing:.14em;color:var(--ink-45);
+  padding:0 var(--s-xs) var(--s-xxs)}
+.navrow{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 var(--s-xs);
+  border-radius:var(--r-ctl);color:var(--ink-70);text-decoration:none;font-size:14.5px;
+  transition:background .16s ease,color .16s ease}
+.navrow i{font-size:17px;opacity:.85}
+.navrow:hover{background:rgba(255,255,255,.06);color:#fff}
+.navrow[aria-current="page"]{background:var(--primary);color:#fff}
+.navrow[aria-current="page"] i{opacity:1}
+.navrow__n{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-45)}
+.navrow[aria-current="page"] .navrow__n{color:rgba(255,255,255,.8)}
+
+/* ─────────── 전역 상단바: 위치와 계정 ─────────── */
+.main{min-width:0;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:var(--s-md);
+  padding:0 var(--s-xxl);background:rgba(10,13,58,.82);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,255,255,.07);min-height:56px}
+
+.crumb{display:flex;align-items:center;gap:7px;font-size:13.5px;min-width:0}
+.crumb a{color:var(--ink-45);text-decoration:none;white-space:nowrap;
+  padding:2px 4px;border-radius:6px;transition:color .16s ease,background .16s ease}
+.crumb a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.crumb i{font-size:11px;color:var(--ink-45);opacity:.7}
+.crumb b{color:var(--ink);font-weight:600;white-space:nowrap}
+
+.top__right{margin-left:auto;display:flex;align-items:center;gap:var(--s-xxs)}
+.iconbtn{position:relative;width:38px;height:38px;border:0;border-radius:var(--r-ctl);
+  background:transparent;color:var(--ink-70);cursor:pointer;display:grid;place-items:center;font-size:18px;
+  transition:background .16s ease,color .16s ease}
+.iconbtn:hover{background:rgba(255,255,255,.08);color:#fff}
+.iconbtn__n{position:absolute;top:5px;right:5px;min-width:17px;height:17px;padding:0 4px;
+  border-radius:var(--r-pill);background:var(--magenta);color:#fff;
+  font-size:10.5px;font-weight:700;line-height:17px;text-align:center}
+.me{display:flex;align-items:center;gap:9px;margin-left:var(--s-xxs);
+  padding:4px 12px 4px 4px;border:0;border-radius:var(--r-pill);background:transparent;
+  color:inherit;cursor:pointer;transition:background .16s ease}
+.me:hover{background:rgba(255,255,255,.08)}
+.me__av{flex:none;width:30px;height:30px;border-radius:50%;background:var(--surface-hi);
+  display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:12px}
+.me__t{text-align:left;line-height:1.28}
+.me__t b{display:block;font-size:13.5px;font-weight:600}
+.me__t small{font-size:11.5px;color:var(--ink-45)}
+
+/* ─────────── 페이지 헤더: 콘텐츠 안, 함께 스크롤된다 ─────────── */
+.pagehead{grid-column:1/-1;display:flex;align-items:center;gap:var(--s-md);flex-wrap:wrap}
+.pagehead h1{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.02em;line-height:1.25}
+.pagehead__state{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-45)}
+.pagehead__actions{margin-left:auto;display:flex;gap:var(--s-sm)}
+
+/* ─────────── 버튼 ─────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:44px;padding:0 var(--s-xl);border:0;border-radius:var(--r-ctl);
+  font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;
+  transition:transform .12s ease,background .16s ease,opacity .16s ease}
+.btn:active{transform:translateY(1px) scale(.985)}
+.btn--primary{background:var(--primary);color:#fff}
+.btn--primary:hover{background:#6b76f5}
+.btn--green{background:var(--green);color:var(--ink-dark);font-weight:700}
+.btn--green:hover{background:#4bf58d}
+.btn--ghost{background:var(--surface);color:var(--ink)}
+.btn--ghost:hover{background:var(--surface-hi)}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+.btn--sm{min-height:36px;padding:0 var(--s-md);font-size:13.5px;border-radius:var(--r-ctl)}
+.btn__spin{width:15px;height:15px;border:2px solid rgba(0,0,0,.28);border-top-color:#000;
+  border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─────────── 본문 2열 ─────────── */
+.body{display:grid;grid-template-columns:minmax(0,1fr) 372px;
+  column-gap:var(--s-xxl);row-gap:var(--s-lg);
+  padding:var(--s-xl) var(--s-xxl) 72px;align-items:start}
+.col{display:flex;flex-direction:column;gap:var(--s-lg);min-width:0}
+
+/* 폼 블록 */
+.block{background:var(--surface);border-radius:var(--r-card);padding:var(--s-xl)}
+.block__h{display:flex;align-items:baseline;gap:var(--s-sm);margin-bottom:var(--s-lg)}
+.block__h h2{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.01em}
+.block__h p{font-size:13px;color:var(--ink-45)}
+
+/* 필드 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-md)}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s-md)}
+.f{display:flex;flex-direction:column;gap:var(--s-xs);min-width:0}
+.f__l{font-size:13.5px;font-weight:600;color:var(--ink-70);display:flex;gap:5px;align-items:center}
+.f__req{color:var(--magenta);font-size:15px;line-height:1}
+.f__c{background:rgba(4,6,28,.55);border:1px solid rgba(255,255,255,.13);border-radius:var(--r-ctl);
+  min-height:44px;padding:10px var(--s-md);width:100%;font-size:15px;color:#fff;
+  transition:border-color .16s ease,background .16s ease}
+.f__c::placeholder{color:rgba(255,255,255,.54)}
+.f__c:hover{border-color:rgba(255,255,255,.24)}
+.f__c:focus{border-color:var(--primary);background:rgba(4,6,28,.8);outline:2px solid #fff;outline-offset:1px}
+textarea.f__c{min-height:92px;resize:vertical;line-height:1.7}
+select.f__c{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff' opacity='0.6'><path d='M4 6l4 4 4-4z'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.f__help{font-size:12.5px;color:var(--ink-45)}
+.f__err{font-size:12.5px;color:var(--danger);display:flex;align-items:center;gap:5px}
+.f--bad .f__c{border-color:var(--danger)}
+.f__unit{position:relative;display:flex;align-items:center}
+.f__unit .f__c{padding-right:52px;font-family:var(--mono)}
+.f__unit span{position:absolute;right:var(--s-md);font-size:13.5px;color:var(--ink-45);pointer-events:none}
+
+/* 색상 칩 */
+.chips{display:flex;flex-wrap:wrap;gap:var(--s-xs)}
+.chip{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 var(--s-sm) 0 10px;
+  border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.16);background:rgba(4,6,28,.45);
+  font-size:13.5px;cursor:pointer;transition:border-color .16s ease,background .16s ease}
+.chip:hover{border-color:rgba(255,255,255,.32)}
+.chip input{position:absolute;opacity:0;width:0;height:0}
+.chip__dot{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.28)}
+.chip:has(input:checked){background:var(--primary);border-color:var(--primary)}
+.chip:has(input:focus-visible){outline:2px solid #fff;outline-offset:2px}
+
+/* 이미지 업로드 */
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:var(--s-sm)}
+.thumb{position:relative;aspect-ratio:1;border-radius:var(--r-card);overflow:hidden;background:rgba(4,6,28,.5)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb__x{position:absolute;top:6px;right:6px;width:28px;height:28px;border:0;border-radius:50%;
+  background:rgba(0,0,0,.62);color:#fff;cursor:pointer;display:grid;place-items:center;font-size:14px}
+.thumb__x:hover{background:#000}
+.thumb__tag{position:absolute;left:6px;bottom:6px;background:var(--primary);color:#fff;
+  font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:var(--r-pill)}
+.drop{aspect-ratio:1;border-radius:var(--r-card);border:1.5px dashed rgba(255,255,255,.22);
+  background:rgba(4,6,28,.32);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;cursor:pointer;color:var(--ink-45);text-align:center;padding:var(--s-sm);
+  transition:border-color .16s ease,color .16s ease,background .16s ease}
+.drop i{font-size:22px}
+.drop span{font-size:12.5px;line-height:1.5}
+.drop:hover{border-color:var(--primary);color:var(--ink);background:rgba(88,101,242,.12)}
+
+/* 옵션 매트릭스 */
+.tablewrap{overflow-x:auto;border-radius:var(--r-ctl);border:1px solid rgba(255,255,255,.09)}
+table{width:100%;border-collapse:collapse;min-width:600px}
+thead th{background:rgba(4,6,28,.55);text-align:left;font-size:12px;font-weight:700;
+  letter-spacing:.1em;color:var(--ink-45);padding:11px var(--s-md);white-space:nowrap}
+tbody td{padding:9px var(--s-md);font-size:14px;border-top:1px solid rgba(255,255,255,.07)}
+tbody tr:hover{background:rgba(255,255,255,.035)}
+td.num{font-family:var(--mono);font-size:13.5px}
+.cellin{background:transparent;border:1px solid transparent;border-radius:8px;
+  min-height:34px;padding:4px 8px;width:92px;font-family:var(--mono);font-size:13.5px;text-align:right}
+.cellin:hover{border-color:rgba(255,255,255,.16)}
+.cellin:focus{border-color:var(--primary);background:rgba(4,6,28,.6)}
+.pill{display:inline-block;padding:2px 10px;border-radius:var(--r-pill);font-size:11.5px;font-weight:700}
+.pill--out{background:var(--magenta);color:#fff}
+.pill--low{background:rgba(255,255,255,.12);color:var(--ink-70)}
+.rowx{background:transparent;border:0;color:var(--ink-45);cursor:pointer;font-size:15px;padding:4px}
+.rowx:hover{color:var(--danger)}
+.tfoot{display:flex;align-items:center;gap:var(--s-md);margin-top:var(--s-sm);flex-wrap:wrap}
+.tfoot__sum{margin-left:auto;font-size:13px;color:var(--ink-45)}
+.tfoot__sum b{font-family:var(--mono);color:var(--ink)}
+
+/* 토글 행 */
+.tog{display:flex;align-items:center;gap:var(--s-md);padding:var(--s-sm) 0}
+.tog + .tog{border-top:1px solid rgba(255,255,255,.07)}
+.tog__t{min-width:0}
+.tog__t b{display:block;font-size:14.5px;font-weight:600}
+.tog__t small{font-size:12.5px;color:var(--ink-45)}
+.switch{margin-left:auto;position:relative;flex:none;width:46px;height:27px;cursor:pointer}
+.switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.switch i{position:absolute;inset:0;background:rgba(255,255,255,.18);border-radius:var(--r-pill);
+  transition:background .18s ease}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;
+  background:#fff;transition:transform .18s cubic-bezier(.16,1,.3,1)}
+.switch input:checked + i{background:var(--primary)}
+.switch input:checked + i::after{transform:translateX(19px)}
+.switch input:focus-visible + i{outline:2px solid #fff;outline-offset:2px}
+
+/* ─────────── 시그니처: 라이브 프리뷰 ─────────── */
+.aside{position:sticky;top:72px;display:flex;flex-direction:column;gap:var(--s-lg)}
+.preview{border-radius:var(--r-panel);padding:var(--s-xl);
+  background:linear-gradient(152deg,#ff5fc8 0%,var(--magenta) 42%,#8b3df0 100%)}
+.preview__h{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;
+  letter-spacing:.1em;color:rgba(255,255,255,.86);margin-bottom:var(--s-md);padding-left:2px}
+.pcard{background:#fff;color:#1a1a1a;border-radius:var(--r-card);overflow:hidden}
+.pcard__img{aspect-ratio:4/3;background:#ece9f5;position:relative}
+.pcard__img img{width:100%;height:100%;object-fit:cover}
+.pcard__badge{position:absolute;top:10px;left:10px;background:var(--magenta);color:#fff;
+  font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-pill)}
+.pcard__b{padding:var(--s-md)}
+.pcard__brand{font-size:12px;color:#6b6b78;font-weight:600}
+.pcard__name{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.35;
+  letter-spacing:-.01em;margin:3px 0 2px;color:#111}
+.pcard__desc{font-size:12.5px;color:#5a5a68;line-height:1.6;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:40px}
+.pcard__row{display:flex;align-items:flex-end;gap:8px;margin-top:var(--s-sm)}
+.pcard__price{font-family:var(--display);font-weight:700;font-size:20px;color:#111}
+.pcard__was{font-size:13px;color:#6f6f7d;text-decoration:line-through}
+.pcard__opts{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+.pcard__opt{border:1px solid #ddd;border-radius:8px;padding:2px 8px;font-size:11.5px;color:#4a4a58;
+  font-family:var(--mono)}
+.pcard__empty{color:#6f6f7d;font-style:normal}
+
+/* 등록 전 확인 */
+.check{background:var(--surface);border-radius:var(--r-card);padding:var(--s-lg) var(--s-xl)}
+.check__h{font-family:var(--display);font-weight:700;font-size:15px;margin-bottom:var(--s-sm)}
+.check li{display:flex;align-items:flex-start;gap:10px;padding:7px 0;font-size:14px}
+.check li i{font-size:16px;margin-top:2px;flex:none}
+.check .ok{color:var(--ink-45)}
+.check .ok i{color:var(--green)}
+.check .todo i{color:var(--magenta)}
+.check__n{margin-top:var(--s-sm);font-size:12.5px;color:var(--ink-45)}
+
+/* 최근 등록 */
+.recent{background:var(--surface);border-radius:var(--r-card);padding:var(--s-lg) var(--s-xl)}
+.recent__h{display:flex;align-items:center;margin-bottom:var(--s-sm)}
+.recent__h b{font-family:var(--display);font-size:15px}
+.recent__h a{margin-left:auto;font-size:13px;text-decoration:none}
+.rrow{display:flex;align-items:center;gap:var(--s-sm);padding:9px 0}
+.rrow + .rrow{border-top:1px solid rgba(255,255,255,.07)}
+.rrow img{width:40px;height:40px;border-radius:10px;object-fit:cover;flex:none}
+.rrow__t{min-width:0;flex:1}
+.rrow__t b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rrow__t small{font-size:12px;color:var(--ink-45);font-family:var(--mono)}
+.rrow__p{font-family:var(--mono);font-size:13px;color:var(--ink-70);white-space:nowrap}
+
+/* ─────────── 토스트 ─────────── */
+.toast{position:fixed;right:var(--s-xxl);bottom:var(--s-xxl);z-index:60;
+  display:flex;align-items:center;gap:11px;max-width:min(400px,calc(100vw - 48px));
+  background:var(--onyx);border:1px solid rgba(255,255,255,.11);border-radius:var(--r-card);
+  padding:var(--s-md) var(--s-lg);
+  box-shadow:0 14px 30px rgba(0,0,0,.42), 0 3px 68px rgba(69,42,124,.1);
+  transform:translateY(20px);opacity:0;pointer-events:none;
+  transition:transform .28s cubic-bezier(.16,1,.3,1),opacity .28s ease}
+.toast[data-open="true"]{transform:translateY(0);opacity:1;pointer-events:auto}
+.toast i{font-size:19px;color:var(--green);flex:none}
+.toast b{display:block;font-size:14.5px}
+.toast small{font-size:12.5px;color:var(--ink-45)}
+
+/* ─────────── 반응형 ─────────── */
+@media (max-width:1279px){
+  .body{grid-template-columns:minmax(0,1fr) 336px;gap:var(--s-lg);padding:var(--s-lg)}
+  .top{padding-left:var(--s-lg);padding-right:var(--s-lg)}
+}
+@media (max-width:1023px){
+  /* 사이드바가 상단 가로 네비로 눕는다 */
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{flex-direction:row;align-items:center;gap:var(--s-md);overflow-x:auto;
+    border-right:0;border-bottom:1px solid rgba(255,255,255,.06);padding:var(--s-sm) var(--s-md)}
+  .side__store{flex:none;padding:0}
+  .side__group{flex-direction:row;flex:none;gap:var(--s-xxs)}
+  .side__cap{display:none}
+  .navrow{white-space:nowrap;padding:0 var(--s-sm)}
+  .body{grid-template-columns:minmax(0,1fr);padding:var(--s-md)}
+  .aside{position:static}
+  .top{padding-left:var(--s-md);padding-right:var(--s-md)}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+@media (max-width:767px){
+  .side__store small{display:none}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .me__t,.crumb a:first-of-type,.crumb i:first-of-type{display:none}
+  .pagehead__actions{width:100%;margin-left:0}
+  .pagehead__actions .btn{flex:1}
+  .pagehead__state{margin-left:auto}
+  .block{padding:var(--s-md)}
+  .preview{border-radius:var(--r-card);padding:var(--s-md)}
+  .toast{right:var(--s-md);left:var(--s-md);bottom:var(--s-md);max-width:none}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important}
+  .mesh span{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="mesh" aria-hidden="true"><span class="m1"></span><span class="m2"></span><span class="m3"></span></div>
+
+<div class="shell">
+
+  <!-- 사이드바 -->
+  <nav class="side" aria-label="관리 메뉴">
+    <div class="side__store">
+      <span class="side__mark" aria-hidden="true">BS</span>
+      <div>
+        <b>BoxingStore</b>
+        <small>자사몰 · 운영중</small>
+      </div>
+    </div>
+
+    <div class="side__group">
+      <div class="side__cap">판매</div>
+      <a class="navrow" href="#"><i class="ph-bold ph-chart-line"></i>대시보드</a>
+      <a class="navrow" href="#" aria-current="page"><i class="ph-bold ph-package"></i>상품<span class="navrow__n">248</span></a>
+      <a class="navrow" href="#"><i class="ph-bold ph-receipt"></i>주문<span class="navrow__n">19</span></a>
+      <a class="navrow" href="#"><i class="ph-bold ph-arrow-u-up-left"></i>반품·교환<span class="navrow__n">3</span></a>
+    </div>
+
+    <div class="side__group">
+      <div class="side__cap">운영</div>
+      <a class="navrow" href="#"><i class="ph-bold ph-users-three"></i>고객</a>
+      <a class="navrow" href="#"><i class="ph-bold ph-ticket"></i>쿠폰</a>
+      <a class="navrow" href="#"><i class="ph-bold ph-gear-six"></i>설정</a>
+    </div>
+  </nav>
+
+  <!-- 본문 -->
+  <div class="main">
+
+    <header class="top">
+      <nav class="crumb" aria-label="현재 위치">
+        <a href="#">대시보드</a>
+        <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
+        <a href="#">상품</a>
+        <i class="ph-bold ph-caret-right" aria-hidden="true"></i>
+        <b aria-current="page">상품 등록</b>
+      </nav>
+
+      <div class="top__right">
+        <button class="iconbtn" type="button" aria-label="알림 4건">
+          <i class="ph-bold ph-bell" aria-hidden="true"></i>
+          <span class="iconbtn__n" aria-hidden="true">4</span>
+        </button>
+        <button class="iconbtn" type="button" aria-label="도움말">
+          <i class="ph-bold ph-question" aria-hidden="true"></i>
+        </button>
+        <button class="me" type="button" aria-label="계정 메뉴 열기">
+          <span class="me__av" aria-hidden="true">하윤</span>
+          <span class="me__t"><b>정하윤</b><small>운영 관리자</small></span>
+          <i class="ph-bold ph-caret-down" style="font-size:11px;color:var(--ink-45)" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <form class="body" id="form" novalidate>
+
+      <div class="pagehead">
+        <h1>상품 등록</h1>
+        <p class="pagehead__state"><i class="ph-bold ph-cloud-check" aria-hidden="true"></i><span id="savedAt">2분 전 임시저장됨</span></p>
+        <div class="pagehead__actions">
+          <button class="btn btn--ghost" type="button" id="btnDraft">임시저장</button>
+          <button class="btn btn--green" type="button" id="btnSubmit">상품 등록</button>
+        </div>
+      </div>
+
+      <!-- 좌열 -->
+      <div class="col">
+
+        <!-- 기본 정보 -->
+        <section class="block">
+          <div class="block__h">
+            <h2>기본 정보</h2>
+            <p>고객이 상품을 찾을 때 쓰는 이름과 분류</p>
+          </div>
+
+          <div class="f" style="margin-bottom:var(--s-md)">
+            <label class="f__l" for="name">상품명 <span class="f__req" aria-hidden="true">*</span></label>
+            <input class="f__c" id="name" name="name" type="text" value="코너맨 프로 스파링 글러브"
+                   placeholder="예: 코너맨 프로 스파링 글러브" maxlength="60" required>
+            <p class="f__help"><span id="nameLen">15</span>/60자. 검색 결과와 상품 카드에 그대로 나온다.</p>
+          </div>
+
+          <div class="grid2" style="margin-bottom:var(--s-md)">
+            <div class="f">
+              <label class="f__l" for="cat">카테고리 <span class="f__req" aria-hidden="true">*</span></label>
+              <select class="f__c" id="cat" name="cat">
+                <option>글러브 / 스파링</option>
+                <option>글러브 / 백 트레이닝</option>
+                <option>헤드기어</option>
+                <option>핸드랩 · 이너글러브</option>
+                <option>마우스피스</option>
+                <option>샌드백 · 스탠드</option>
+              </select>
+            </div>
+            <div class="f">
+              <label class="f__l" for="brand">브랜드</label>
+              <input class="f__c" id="brand" name="brand" type="text" value="코너맨" placeholder="브랜드명">
+            </div>
+          </div>
+
+          <div class="f">
+            <label class="f__l" for="desc">한 줄 설명</label>
+            <textarea class="f__c" id="desc" name="desc" maxlength="120"
+              placeholder="상품 카드에 두 줄까지 보인다.">레이스업 12온스, 스파링 3라운드 기준으로 손등 충격을 나눠 받도록 폼을 3겹으로 겹쳤다.</textarea>
+            <p class="f__help">카드에서는 두 줄까지만 보인다. 상세 설명은 등록 후 편집기에서 작성한다.</p>
+          </div>
+        </section>
+
+        <!-- 이미지 -->
+        <section class="block">
+          <div class="block__h">
+            <h2>상품 이미지</h2>
+            <p>첫 번째 이미지가 카드 대표 이미지로 쓰인다</p>
+          </div>
+
+          <div class="imgs">
+            <figure class="thumb">
+              <img src="https://picsum.photos/seed/cornerman-glove-red-front/400/400" alt="코너맨 프로 스파링 글러브 정면">
+              <span class="thumb__tag">대표</span>
+              <button class="thumb__x" type="button" aria-label="정면 이미지 삭제"><i class="ph-bold ph-x" aria-hidden="true"></i></button>
+            </figure>
+            <figure class="thumb">
+              <img src="https://picsum.photos/seed/cornerman-glove-palm/400/400" alt="글러브 손바닥면">
+              <button class="thumb__x" type="button" aria-label="손바닥면 이미지 삭제"><i class="ph-bold ph-x" aria-hidden="true"></i></button>
+            </figure>
+            <figure class="thumb">
+              <img src="https://picsum.photos/seed/cornerman-glove-wrist-strap/400/400" alt="손목 스트랩 부분">
+              <button class="thumb__x" type="button" aria-label="손목 스트랩 이미지 삭제"><i class="ph-bold ph-x" aria-hidden="true"></i></button>
+            </figure>
+            <button class="drop" type="button">
+              <i class="ph-bold ph-plus" aria-hidden="true"></i>
+              <span>이미지 추가<br>JPG · PNG · 최대 5MB</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 가격과 재고 -->
+        <section class="block">
+          <div class="block__h">
+            <h2>가격</h2>
+            <p>옵션별 추가금은 아래 옵션 표에서 정한다</p>
+          </div>
+
+          <div class="grid3">
+            <div class="f">
+              <label class="f__l" for="price">판매가 <span class="f__req" aria-hidden="true">*</span></label>
+              <div class="f__unit">
+                <input class="f__c" id="price" name="price" type="text" inputmode="numeric" value="189,000">
+                <span>원</span>
+              </div>
+            </div>
+            <div class="f">
+              <label class="f__l" for="listPrice">정가</label>
+              <div class="f__unit">
+                <input class="f__c" id="listPrice" name="listPrice" type="text" inputmode="numeric" value="228,000">
+                <span>원</span>
+              </div>
+              <p class="f__help" id="discount">17% 할인으로 표시된다</p>
+            </div>
+            <div class="f f--bad">
+              <label class="f__l" for="cost">원가 <span class="f__req" aria-hidden="true">*</span></label>
+              <div class="f__unit">
+                <input class="f__c" id="cost" name="cost" type="text" inputmode="numeric" value="" placeholder="0" aria-describedby="costErr">
+                <span>원</span>
+              </div>
+              <p class="f__err" id="costErr"><i class="ph-bold ph-warning-circle" aria-hidden="true"></i>원가를 입력해야 마진 리포트가 계산된다</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 옵션 매트릭스 -->
+        <section class="block">
+          <div class="block__h">
+            <h2>옵션과 재고</h2>
+            <p>사이즈와 색상 조합마다 재고를 따로 잡는다</p>
+          </div>
+
+          <div class="f" style="margin-bottom:var(--s-md)">
+            <span class="f__l">판매 색상</span>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" checked><span class="chip__dot" style="background:#161616"></span>블랙</label>
+              <label class="chip"><input type="checkbox" checked><span class="chip__dot" style="background:#c9223a"></span>레드</label>
+              <label class="chip"><input type="checkbox"><span class="chip__dot" style="background:#f2f2f2"></span>화이트</label>
+              <label class="chip"><input type="checkbox"><span class="chip__dot" style="background:#1f4fd8"></span>네이비</label>
+            </div>
+          </div>
+
+          <div class="tablewrap">
+            <table>
+              <caption class="sr">사이즈와 색상 조합별 재고 및 추가금액</caption>
+              <thead>
+                <tr>
+                  <th scope="col">사이즈</th>
+                  <th scope="col">색상</th>
+                  <th scope="col">SKU</th>
+                  <th scope="col">추가금액</th>
+                  <th scope="col">재고</th>
+                  <th scope="col"><span class="sr">삭제</span></th>
+                </tr>
+              </thead>
+              <tbody id="variants">
+                <tr id="varEmpty" hidden>
+                  <td colspan="6" style="padding:var(--s-xl);text-align:center;color:var(--ink-45)">
+                    옵션이 없다. 이대로 등록하면 단일 상품으로 팔린다.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num">10 oz</td><td>블랙</td><td class="num">CM-PRO-BK-10</td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="10온스 블랙 추가금액"></td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="42" aria-label="10온스 블랙 재고"></td>
+                  <td><button class="rowx" type="button" aria-label="10온스 블랙 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>
+                </tr>
+                <tr>
+                  <td class="num">12 oz</td><td>블랙</td><td class="num">CM-PRO-BK-12</td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="12온스 블랙 추가금액"></td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="18" aria-label="12온스 블랙 재고"></td>
+                  <td><button class="rowx" type="button" aria-label="12온스 블랙 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>
+                </tr>
+                <tr>
+                  <td class="num">14 oz</td><td>블랙</td><td class="num">CM-PRO-BK-14</td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="6,000" aria-label="14온스 블랙 추가금액"></td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="7" aria-label="14온스 블랙 재고"></td>
+                  <td><button class="rowx" type="button" aria-label="14온스 블랙 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>
+                </tr>
+                <tr>
+                  <td class="num">10 oz</td><td>레드</td><td class="num">CM-PRO-RD-10</td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="10온스 레드 추가금액"></td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="33" aria-label="10온스 레드 재고"></td>
+                  <td><button class="rowx" type="button" aria-label="10온스 레드 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>
+                </tr>
+                <tr>
+                  <td class="num">12 oz</td><td>레드</td><td class="num">CM-PRO-RD-12</td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="12온스 레드 추가금액"></td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="12" aria-label="12온스 레드 재고"></td>
+                  <td><button class="rowx" type="button" aria-label="12온스 레드 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>
+                </tr>
+                <tr>
+                  <td class="num">14 oz</td><td>레드 <span class="pill pill--out">품절</span></td><td class="num">CM-PRO-RD-14</td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="6,000" aria-label="14온스 레드 추가금액"></td>
+                  <td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="14온스 레드 재고"></td>
+                  <td><button class="rowx" type="button" aria-label="14온스 레드 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tfoot">
+            <button class="btn btn--ghost btn--sm" type="button" id="btnAddVariant">
+              <i class="ph-bold ph-plus" aria-hidden="true"></i>옵션 추가
+            </button>
+            <span class="tfoot__sum">총 재고 <b id="stockSum">112</b>개 · 옵션 <b id="variantCount">6</b>개</span>
+          </div>
+        </section>
+
+        <!-- 노출 설정 -->
+        <section class="block">
+          <div class="block__h">
+            <h2>노출 설정</h2>
+            <p>등록 직후 고객에게 어떻게 보일지 정한다</p>
+          </div>
+
+          <div class="tog">
+            <div class="tog__t"><b>바로 판매 시작</b><small>끄면 비공개 상태로 저장된다</small></div>
+            <label class="switch"><input type="checkbox" checked aria-label="바로 판매 시작"><i aria-hidden="true"></i></label>
+          </div>
+          <div class="tog">
+            <div class="tog__t"><b>신상품 배지 표시</b><small>등록일부터 14일간 카드에 배지가 붙는다</small></div>
+            <label class="switch"><input type="checkbox" checked id="tgNew" aria-label="신상품 배지 표시"><i aria-hidden="true"></i></label>
+          </div>
+          <div class="tog">
+            <div class="tog__t"><b>품절 옵션 숨기기</b><small>재고 0인 옵션을 상품 페이지에서 감춘다</small></div>
+            <label class="switch"><input type="checkbox" aria-label="품절 옵션 숨기기"><i aria-hidden="true"></i></label>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- 우열 -->
+      <aside class="col aside" aria-label="미리보기와 등록 상태">
+
+        <!-- 시그니처: 라이브 프리뷰 -->
+        <section class="preview">
+          <h2 class="preview__h"><i class="ph-bold ph-eye" aria-hidden="true"></i>고객에게 보이는 모습</h2>
+          <article class="pcard">
+            <div class="pcard__img">
+              <img src="https://picsum.photos/seed/cornerman-glove-red-front/600/450" alt="코너맨 프로 스파링 글러브 대표 이미지">
+              <span class="pcard__badge" id="pvBadge">신상품</span>
+            </div>
+            <div class="pcard__b">
+              <p class="pcard__brand" id="pvBrand">코너맨</p>
+              <h3 class="pcard__name" id="pvName">코너맨 프로 스파링 글러브</h3>
+              <p class="pcard__desc" id="pvDesc">레이스업 12온스, 스파링 3라운드 기준으로 손등 충격을 나눠 받도록 폼을 3겹으로 겹쳤다.</p>
+              <div class="pcard__row">
+                <span class="pcard__price" id="pvPrice">189,000원</span>
+                <span class="pcard__was" id="pvWas">228,000원</span>
+              </div>
+              <div class="pcard__opts">
+                <span class="pcard__opt">10 oz</span>
+                <span class="pcard__opt">12 oz</span>
+                <span class="pcard__opt">14 oz</span>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- 등록 전 확인 -->
+        <section class="check">
+          <h2 class="check__h">등록 전 확인</h2>
+          <ul>
+            <li class="ok"><i class="ph-bold ph-check-circle" aria-hidden="true"></i>상품명, 카테고리, 판매가 입력됨</li>
+            <li class="ok"><i class="ph-bold ph-check-circle" aria-hidden="true"></i>이미지 3장, 옵션 6개 등록됨</li>
+            <li class="todo"><i class="ph-bold ph-circle-dashed" aria-hidden="true"></i>원가가 비어 있다. 마진 리포트에서 이 상품이 빠진다.</li>
+          </ul>
+          <p class="check__n">원가 없이도 등록은 된다. 나중에 상품 목록에서 채워도 된다.</p>
+        </section>
+
+        <!-- 최근 등록 -->
+        <section class="recent">
+          <div class="recent__h"><b>최근 등록</b><a href="#">전체 보기</a></div>
+          <div class="rrow">
+            <img src="https://picsum.photos/seed/cornerman-headgear-navy/80/80" alt="코너맨 오픈페이스 헤드기어">
+            <div class="rrow__t"><b>코너맨 오픈페이스 헤드기어</b><small>어제 · 재고 24</small></div>
+            <span class="rrow__p">134,000원</span>
+          </div>
+          <div class="rrow">
+            <img src="https://picsum.photos/seed/cornerman-handwrap-450/80/80" alt="코너맨 멕시칸 핸드랩 450cm">
+            <div class="rrow__t"><b>코너맨 멕시칸 핸드랩 450</b><small>3일 전 · 재고 186</small></div>
+            <span class="rrow__p">14,500원</span>
+          </div>
+          <div class="rrow">
+            <img src="https://picsum.photos/seed/cornerman-mouthguard-clear/80/80" alt="코너맨 듀얼레이어 마우스피스">
+            <div class="rrow__t"><b>코너맨 듀얼레이어 마우스피스</b><small>5일 전 · 재고 71</small></div>
+            <span class="rrow__p">28,000원</span>
+          </div>
+        </section>
+
+      </aside>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <i class="ph-bold ph-check-circle" aria-hidden="true"></i>
+  <div><b id="toastT">상품을 등록했다</b><small id="toastD">자사몰에서 바로 판매를 시작한다</small></div>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var won = function(n){ return n.toLocaleString('ko-KR') + '원'; };
+  var num = function(s){ return parseInt(String(s).replace(/[^0-9]/g,''), 10) || 0; };
+
+  /* 라이브 프리뷰: 입력하는 대로 고객 카드에 반영 */
+  function sync(){
+    var name = $('name').value.trim();
+    $('pvName').textContent = name || '상품명을 입력하세요';
+    $('pvName').classList.toggle('pcard__empty', !name);
+    $('nameLen').textContent = $('name').value.length;
+
+    var brand = $('brand').value.trim();
+    $('pvBrand').textContent = brand || 'BoxingStore';
+
+    var desc = $('desc').value.trim();
+    $('pvDesc').textContent = desc || '한 줄 설명이 비어 있다';
+    $('pvDesc').classList.toggle('pcard__empty', !desc);
+
+    var price = num($('price').value), list = num($('listPrice').value);
+    $('pvPrice').textContent = price ? won(price) : '가격 미정';
+    var showWas = list > price && price > 0;
+    $('pvWas').textContent = showWas ? won(list) : '';
+    $('discount').textContent = showWas
+      ? Math.round((1 - price / list) * 100) + '% 할인으로 표시된다'
+      : '정가가 판매가보다 높아야 할인율이 붙는다';
+
+    $('pvBadge').hidden = !$('tgNew').checked;
+  }
+
+  ['name','brand','desc','price','listPrice'].forEach(function(id){
+    $(id).addEventListener('input', sync);
+  });
+  $('tgNew').addEventListener('change', sync);
+
+  /* 원가 인라인 에러: 채우면 즉시 풀린다 */
+  $('cost').addEventListener('input', function(){
+    var filled = num(this.value) > 0;
+    this.closest('.f').classList.toggle('f--bad', !filled);
+    $('costErr').hidden = filled;
+  });
+
+  /* 재고 합계 */
+  function stock(){
+    var rows = document.querySelectorAll('#variants tr:not(#varEmpty)');
+    var sum = 0;
+    rows.forEach(function(tr){ sum += num(tr.querySelectorAll('.cellin')[1].value); });
+    $('stockSum').textContent = sum.toLocaleString('ko-KR');
+    $('variantCount').textContent = rows.length;
+    $('varEmpty').hidden = rows.length > 0;
+  }
+  $('variants').addEventListener('input', stock);
+
+  /* 옵션 행 삭제 */
+  $('variants').addEventListener('click', function(e){
+    var btn = e.target.closest('.rowx');
+    if (!btn) return;
+    btn.closest('tr').remove();
+    stock();
+  });
+
+  /* 옵션 행 추가 */
+  var oz = [8, 10, 12, 14, 16];
+  $('btnAddVariant').addEventListener('click', function(){
+    var n = document.querySelectorAll('#variants tr:not(#varEmpty)').length;
+    var size = oz[n % oz.length] + ' oz';
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="num">' + size + '</td><td>블랙</td>' +
+      '<td class="num">CM-PRO-BK-' + oz[n % oz.length] + '</td>' +
+      '<td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="' + size + ' 추가금액"></td>' +
+      '<td><input class="cellin" type="text" inputmode="numeric" value="0" aria-label="' + size + ' 재고"></td>' +
+      '<td><button class="rowx" type="button" aria-label="' + size + ' 옵션 삭제"><i class="ph-bold ph-trash" aria-hidden="true"></i></button></td>';
+    $('variants').appendChild(tr);
+    stock();
+    tr.querySelector('.cellin').focus();
+  });
+
+  /* 토스트 */
+  var timer;
+  function toast(title, detail){
+    $('toastT').textContent = title;
+    $('toastD').textContent = detail;
+    $('toast').dataset.open = 'true';
+    clearTimeout(timer);
+    timer = setTimeout(function(){ $('toast').dataset.open = 'false'; }, 3600);
+  }
+
+  $('btnDraft').addEventListener('click', function(){
+    $('savedAt').textContent = '방금 임시저장됨';
+    toast('임시저장했다', '상품 목록의 임시저장 탭에서 이어서 작성한다');
+  });
+
+  /* 등록: 진행 상태를 버튼에서 보여준다 */
+  $('btnSubmit').addEventListener('click', function(){
+    var b = this, label = b.textContent;
+    b.disabled = true;
+    b.innerHTML = '<span class="btn__spin" aria-hidden="true"></span>등록하는 중';
+    setTimeout(function(){
+      b.disabled = false;
+      b.textContent = label;
+      toast('상품을 등록했다', '자사몰에서 바로 판매를 시작한다');
+    }, 1100);
+  });
+
+  $('form').addEventListener('submit', function(e){ e.preventDefault(); });
+
+  sync();
+  stock();
+})();
+</script>
+</body>
+</html>
