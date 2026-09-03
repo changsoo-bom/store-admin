@@ -42,8 +42,18 @@ add)
   BR="$2"
   DIR="$(dir_for "$BR")"
 
-  git -C "$ROOT" fetch --quiet origin "$BASE" || echo "  원격을 못 가져왔다. 로컬 $BASE 로 판다."
-  git -C "$ROOT" worktree add "$DIR" -b "$BR" "$BASE"
+  # git fetch 는 로컬 main 을 갱신하지 않는다. origin/main 에서 분기해야 fetch 가 의미를 갖는다.
+  # --no-track 이 없으면 upstream 이 origin/main 으로 박혀서 나중에 push 가 거절된다.
+  if git -C "$ROOT" fetch --quiet origin "$BASE" 2>/dev/null \
+     && git -C "$ROOT" rev-parse --verify --quiet "origin/$BASE" >/dev/null; then
+    START="origin/$BASE"
+    EXTRA="--no-track"
+  else
+    echo "  원격을 못 읽었다. 로컬 $BASE 로 판다."
+    START="$BASE"
+    EXTRA=""
+  fi
+  git -C "$ROOT" worktree add "$DIR" -b "$BR" "$START" $EXTRA
 
   for f in "${CARRY[@]}"; do
     if [ -f "$ROOT/$f" ]; then
@@ -72,11 +82,20 @@ close)
     exit 1
   fi
 
+  # 머지하기 전에 확인한다. 머지해 놓고 멈추면 되돌리기 번거롭다.
+  if [ -d "$DIR" ] && [ -n "$(git -C "$DIR" status --porcelain --untracked-files=no)" ]; then
+    echo "커밋 안 된 변경이 남아 있다: $DIR" >&2
+    git -C "$DIR" status --short >&2
+    exit 1
+  fi
+
   # 안 되면 여기서 멈춘다. rebase 하라는 신호다.
   git -C "$ROOT" merge --ff-only "$BR"
 
-  # 커밋 안 된 게 남아 있으면 remove 가 거절한다. 그게 맞는 동작이다.
-  git -C "$ROOT" worktree remove "$DIR"
+  # worktree remove 는 node_modules 를 못 지워서 "Directory not empty" 로 실패한다.
+  # 워크트리마다 node_modules 가 항상 있으니 직접 지우고 등록만 정리한다.
+  rm -rf "$DIR"
+  git -C "$ROOT" worktree prune
   git -C "$ROOT" branch -d "$BR"
 
   echo

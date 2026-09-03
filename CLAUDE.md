@@ -53,8 +53,15 @@ C:\workspace\BoxingStore\
 ./scripts/wt.sh ls
 ```
 
-`add` 는 gitignore 대상이라 따라오지 않는 `.env.local` 과 `.claude/settings.local.json` 을 복사한다.
-`close` 는 `--ff-only` 라 머지 커밋을 만들지 않고, 안 되면 그 자리에서 멈춘다. rebase 하라는 신호다.
+`add` 는 `origin/main` 을 fetch 한 뒤 거기서 분기한다. `git fetch` 는 로컬 `main` 을 갱신하지
+않으므로 로컬에서 분기하면 fetch 가 의미가 없다. `--no-track` 을 붙여 upstream 이 `origin/main` 으로
+박히는 것도 막는다. 박히면 나중에 `git push` 가 거절한다.
+gitignore 대상이라 따라오지 않는 `.env.local` 과 `.claude/settings.local.json` 도 복사한다.
+
+`close` 는 커밋 안 된 변경이 있으면 머지 전에 멈춘다. `--ff-only` 라 머지 커밋을 만들지 않고,
+ff 가 안 되면 그 자리에서 멈춘다. rebase 하라는 신호다.
+정리는 `git worktree remove` 가 아니라 디렉터리를 직접 지우고 `prune` 한다.
+`remove` 는 `node_modules` 를 못 지워서 항상 `Directory not empty` 로 실패한다.
 
 **`node_modules` 를 심링크로 공유하지 않는다.** pnpm 은 전역 스토어에서 하드링크로 붙어서
 워크트리마다 `pnpm install` 하는 게 더 빠르고 안전하다. 디스크도 거의 안 먹는다.
