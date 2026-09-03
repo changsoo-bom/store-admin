@@ -35,6 +35,18 @@ pnpm db:studio        # 브라우저 DB 뷰어
 
 **브랜치를 바꾸지 않고 옆에 디렉터리를 판다.** 규칙은 Obsidian `개발-공통규칙/git-worktree.md`.
 
+**`feat` 이나 `fix` 성격의 작업은 본체에서 시작하지 않는다.** 워크트리를 먼저 파고 거기서 작업한다.
+본체 `main` 은 항상 깨끗한 상태로 둔다. 오타 수정이나 문서 한 줄처럼 커밋 하나로 끝나는 건 예외다.
+
+구조는 형제 디렉터리 방식이다. bare 패턴은 쓰지 않는다.
+
+```
+C:\workspace\BoxingStore\
+├── store-admin/                 ← 본체, main 이 항상 여기 체크아웃돼 있다
+├── store-admin-variant-stock/   ← wt.sh add 로 생긴다
+└── store-admin-hotfix/
+```
+
 ```bash
 ./scripts/wt.sh add   fix/variant-stock   # ../store-admin-variant-stock 을 만들고 pnpm install 까지
 ./scripts/wt.sh close fix/variant-stock   # main 으로 ff-머지한 뒤 워크트리와 브랜치 삭제
