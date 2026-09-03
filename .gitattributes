@@ -1,0 +1,12 @@
+# 줄바꿈은 저장소에서 LF 로 통일한다. 체크아웃 시에만 플랫폼에 맞춘다.
+* text=auto eol=lf
+
+# 셸 스크립트는 CRLF 로 체크아웃되면 shebang 이 깨진다. 항상 LF.
+*.sh text eol=lf
+
+# 바이너리
+*.ico binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
