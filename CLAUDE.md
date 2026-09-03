@@ -31,6 +31,24 @@ pnpm db:push          # SQL 파일 없이 바로 반영 (프로토타이핑 전�
 pnpm db:studio        # 브라우저 DB 뷰어
 ```
 
+## 워크트리
+
+**브랜치를 바꾸지 않고 옆에 디렉터리를 판다.** 규칙은 Obsidian `개발-공통규칙/git-worktree.md`.
+
+```bash
+./scripts/wt.sh add   fix/variant-stock   # ../store-admin-variant-stock 을 만들고 pnpm install 까지
+./scripts/wt.sh close fix/variant-stock   # main 으로 ff-머지한 뒤 워크트리와 브랜치 삭제
+./scripts/wt.sh ls
+```
+
+`add` 는 gitignore 대상이라 따라오지 않는 `.env.local` 과 `.claude/settings.local.json` 을 복사한다.
+`close` 는 `--ff-only` 라 머지 커밋을 만들지 않고, 안 되면 그 자리에서 멈춘다. rebase 하라는 신호다.
+
+**`node_modules` 를 심링크로 공유하지 않는다.** pnpm 은 전역 스토어에서 하드링크로 붙어서
+워크트리마다 `pnpm install` 하는 게 더 빠르고 안전하다. 디스크도 거의 안 먹는다.
+
+동시에 두 개를 띄울 땐 포트를 나눈다. `pnpm dev --port 3001`.
+
 ## 환경변수
 
 `.env.local` 에 둔다. `.env.example` 을 복사해서 채운다.
