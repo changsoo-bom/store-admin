@@ -85,19 +85,29 @@ ff 가 안 되면 그 자리에서 멈춘다. rebase 하라는 신호다.
 - [데이터 패턴](.claude/rules/data.md) — 읽기는 서버 컴포넌트, 쓰기는 Server Action, 소유권 검증
 - [Drizzle](.claude/rules/drizzle.md) — 스키마 정의, 쿼리, 트랜잭션, 마이그레이션
 - [상태 관리](.claude/rules/state.md) — 서버 데이터 / searchParams / Zustand / TanStack Query
-- [스타일](.claude/rules/styling.md) — Tailwind v4, 다크 모드, 클래스 순서
+- [스타일](.claude/rules/styling.md) — Tailwind v4, 폰트, 한글 조판, 클래스 순서
 
-## 프로토타입
+## 디자인
 
-`prototype/` 에 HTML 시안이 있다. 구현할 때 참조한다. 빌드에 포함되지 않는다.
+**[DESIGN.md](DESIGN.md) 가 규칙이고 `prototype/dashboard.html` 이 원본이다.**
+화면을 짜기 전에 DESIGN.md 를 읽는다. 둘이 어긋나면 시안을 믿고 DESIGN.md 를 고친다.
 
-| 파일 | 내용 |
-|---|---|
-| `dashboard.html` | 운영 대시보드 (Miro 디자인 언어) |
-| `product-new.html` | 상품 등록 (Discord 디자인 언어) |
-| `product-new-cinema.html` | 상품 등록 대안 시안 |
+흰 캔버스 위의 관리자 도구다. `#050038` 하나가 모든 액션을 맡고,
+카나리 옐로우는 워드마크 전용, 파스텔 다섯 개는 상태 구분에만 쓴다.
 
-**디자인 언어는 아직 확정되지 않았다.** 실제 화면을 짜기 전에 어느 쪽으로 갈지 정한다.
+토큰은 `src/app/globals.css` 의 `@theme inline` 에 등록돼 있어 Tailwind 유틸리티로 바로 쓴다.
+
+```tsx
+<div className="rounded-panel border border-hairline bg-canvas p-5">
+  <h2 className="font-display text-[17px] font-medium">패널 제목</h2>
+  <p className="text-steel">보조 설명</p>
+</div>
+```
+
+**새 색이나 반경은 DESIGN.md 표에 먼저 추가하고 `globals.css` 에 등록한 뒤 쓴다.**
+컴포넌트에서 임의의 hex 나 `rounded-lg` 같은 Tailwind 기본 반경을 쓰지 않는다.
+
+라이트 전용이다. `dark:` 를 쓰지 않는다. 이유는 DESIGN.md 하단에 있다.
 
 ## 아직 없는 것
 

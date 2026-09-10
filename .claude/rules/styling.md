@@ -5,6 +5,9 @@ globs: ["src/**/*.tsx", "src/app/globals.css"]
 
 # 스타일
 
+**색·타이포·간격·모서리의 실제 값은 [DESIGN.md](../../DESIGN.md) 에 있다.**
+이 문서는 *어떻게* 쓰는지를, DESIGN.md 는 *무엇을* 쓰는지를 담는다.
+
 ## CSS 기반 설정
 
 **`tailwind.config.js` 를 쓰지 않는다.** v4 는 CSS 에서 설정한다.
