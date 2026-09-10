@@ -35,7 +35,7 @@ export function Header() {
           px-5 text-sm font-medium text-on-dark no-underline transition-colors duration-150
           ease-brand hover:bg-primary-hover"
       >
-        상품 등록
+        제품 등록
       </Link>
     </header>
   );

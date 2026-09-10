@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     default: "BoxingStore 관리자",
     template: "%s · BoxingStore 관리자",
   },
-  description: "복싱 용품 스토어 운영 도구. 상품과 주문, 재고를 다룬다.",
+  description: "복싱 용품 스토어 운영 도구. 제품과 카테고리, 공지사항을 다룬다.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

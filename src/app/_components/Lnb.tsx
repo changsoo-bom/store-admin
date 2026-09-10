@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { NAV_GROUPS, findNavItem } from "@/constants/nav";
+import { NAV_ITEMS, findNavItem } from "@/constants/nav";
 
 export function Lnb() {
   const pathname = usePathname();
@@ -32,37 +32,28 @@ export function Lnb() {
         </b>
       </Link>
 
-      {NAV_GROUPS.map((group) => (
-        <div
-          key={group.caption}
-          className="flex flex-col gap-0.5 max-lg:flex-none max-lg:flex-row"
-        >
-          <p className="px-2 pb-1 text-[11px] font-semibold tracking-[0.5px] text-steel max-lg:hidden">
-            {group.caption}
-          </p>
-
-          {group.items.map(({ href, label, icon: Icon }) => {
-            const active = current?.href === href;
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-field px-3
-                  text-[15px] font-medium no-underline transition-colors duration-150 ease-brand
-                  ${
-                    active
-                      ? "bg-primary text-on-dark"
-                      : "text-slate hover:bg-surface hover:text-ink"
-                  }`}
-              >
-                <Icon size={18} aria-hidden />
-                {label}
-              </Link>
-            );
-          })}
-        </div>
-      ))}
+      <div className="flex flex-col gap-0.5 max-lg:flex-none max-lg:flex-row">
+        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          const active = current?.href === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-field px-3
+                text-[15px] font-medium no-underline transition-colors duration-150 ease-brand
+                ${
+                  active
+                    ? "bg-primary text-on-dark"
+                    : "text-slate hover:bg-surface hover:text-ink"
+                }`}
+            >
+              <Icon size={18} aria-hidden />
+              {label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
