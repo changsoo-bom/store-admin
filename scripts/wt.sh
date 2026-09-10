@@ -83,20 +83,35 @@ close)
   fi
 
   # 머지하기 전에 확인한다. 머지해 놓고 멈추면 되돌리기 번거롭다.
-  if [ -d "$DIR" ] && [ -n "$(git -C "$DIR" status --porcelain --untracked-files=no)" ]; then
+  if [ -e "$DIR/.git" ] && [ -n "$(git -C "$DIR" status --porcelain --untracked-files=no)" ]; then
     echo "커밋 안 된 변경이 남아 있다: $DIR" >&2
     git -C "$DIR" status --short >&2
     exit 1
   fi
+
+  BEFORE="$(git -C "$ROOT" rev-parse HEAD)"
 
   # 안 되면 여기서 멈춘다. rebase 하라는 신호다.
   git -C "$ROOT" merge --ff-only "$BR"
 
   # worktree remove 는 node_modules 를 못 지워서 "Directory not empty" 로 실패한다.
   # 워크트리마다 node_modules 가 항상 있으니 직접 지우고 등록만 정리한다.
-  rm -rf "$DIR"
+  if ! rm -rf "$DIR" 2>/dev/null; then
+    echo "디렉터리를 못 지웠다: $DIR" >&2
+    echo "그 안에서 도는 서버나 열어 둔 터미널이 있는지 본다." >&2
+    echo "머지는 끝났으니 정리한 뒤 close 를 다시 실행하면 이어서 지운다." >&2
+    exit 1
+  fi
   git -C "$ROOT" worktree prune
   git -C "$ROOT" branch -d "$BR"
+
+  # 락파일이 바뀐 브랜치를 머지했으면 본체 node_modules 가 뒤처진다.
+  # 안 깔면 다음 pnpm dev 가 없는 모듈을 찾는다.
+  if ! git -C "$ROOT" diff --quiet "$BEFORE" HEAD -- pnpm-lock.yaml; then
+    echo "  락파일이 바뀌었다. 본체에 다시 설치한다."
+    ( cd "$ROOT" && pnpm install )
+    echo "  개발 서버가 떠 있으면 다시 시작한다. 모듈 해석이 캐시돼 있다."
+  fi
 
   echo
   echo "머지하고 지웠다. 푸시는 따로 한다."

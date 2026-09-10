@@ -58,7 +58,9 @@ C:\workspace\BoxingStore\
 박히는 것도 막는다. 박히면 나중에 `git push` 가 거절한다.
 gitignore 대상이라 따라오지 않는 `.env.local` 과 `.claude/settings.local.json` 도 복사한다.
 
-`close` 는 커밋 안 된 변경이 있으면 머지 전에 멈춘다. `--ff-only` 라 머지 커밋을 만들지 않고,
+`close` 는 머지한 브랜치가 `pnpm-lock.yaml` 을 바꿨으면 본체에 다시 설치한다.
+안 하면 다음 `pnpm dev` 가 없는 모듈을 찾는다. 개발 서버가 떠 있었다면 다시 시작한다.
+커밋 안 된 변경이 있으면 머지 전에 멈춘다. `--ff-only` 라 머지 커밋을 만들지 않고,
 ff 가 안 되면 그 자리에서 멈춘다. rebase 하라는 신호다.
 정리는 `git worktree remove` 가 아니라 디렉터리를 직접 지우고 `prune` 한다.
 `remove` 는 `node_modules` 를 못 지워서 항상 `Directory not empty` 로 실패한다.
