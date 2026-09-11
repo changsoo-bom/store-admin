@@ -15,10 +15,10 @@ type Props = {
 
 type PageSizeProps = { value: number; sizes: number[]; onChange: (size: number) => void };
 
-/** 표 위 '총 N건' 줄 오른쪽에 놓는다. 바깥 라벨이 없어서 옵션 글자가 뜻을 담는다 */
+/** 표 위 '총 N건' 줄 오른쪽에 놓는다. 보이는 라벨은 없고 스크린리더에만 aria-label 로 읽힌다 */
 export function PageSizeSelect({ value, sizes, onChange }: PageSizeProps) {
   return (
-    <span className="relative block w-[104px] text-steel">
+    <span className="relative block w-[84px] text-steel">
       <select
         aria-label="페이지당 행 수"
         value={value}
@@ -27,7 +27,7 @@ export function PageSizeSelect({ value, sizes, onChange }: PageSizeProps) {
       >
         {sizes.map((size) => (
           <option key={size} value={size}>
-            {size}개씩
+            {size}
           </option>
         ))}
       </select>
