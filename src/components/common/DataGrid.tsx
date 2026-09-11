@@ -7,7 +7,7 @@ import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import type { CustomCellRendererProps, CustomNoRowsOverlayProps } from "ag-grid-react";
 import { useRef, useState } from "react";
 
-import { Pagination } from "@/components/ui/Pagination";
+import { PageSizeSelect, Pagination } from "@/components/ui/Pagination";
 
 /**
  * 목록 화면의 표. 컬럼 정의는 서버 컴포넌트에서 넘어오므로 함수를 담을 수 없다.
@@ -127,9 +127,12 @@ export function DataGrid<T>({ rows, columns, emptyTitle, emptyHint }: Props<T>) 
 
   return (
     <section className="flex flex-col gap-2">
-      <p className="text-[13px] text-steel">
-        총 <b className="font-mono font-medium text-ink tabular-nums">{rows.length.toLocaleString("ko-KR")}</b>건
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[13px] text-steel">
+          총 <b className="font-mono font-medium text-ink tabular-nums">{rows.length.toLocaleString("ko-KR")}</b>건
+        </p>
+        <PageSizeSelect value={pageSize} sizes={PAGE_SIZES} onChange={setPageSize} />
+      </div>
       <AgGridProvider modules={modules}>
         {/* ponytail: 페이지를 클라이언트에서 나눈다. 수천 건을 넘기면 searchParams 의 page 로 서버에서 자른다 */}
         <AgGridReact<T>
@@ -156,9 +159,6 @@ export function DataGrid<T>({ rows, columns, emptyTitle, emptyHint }: Props<T>) 
         page={page}
         totalPages={totalPages}
         onPageChange={(p) => gridRef.current?.api.paginationGoToPage(p)}
-        pageSize={pageSize}
-        pageSizes={PAGE_SIZES}
-        onPageSizeChange={setPageSize}
       />
     </section>
   );
