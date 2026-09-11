@@ -45,12 +45,12 @@ export const productWithVariantsSchema = productCreateSchema.extend({
   variants: z.array(variantCreateSchema).min(1, "옵션을 하나 이상 추가해주세요"),
 });
 
-/** 목록 화면의 searchParams */
+/** 목록 화면의 searchParams. 비운 값과 잘못된 값은 조건 없음으로 본다 */
 export const productListParamsSchema = z.object({
-  q: z.string().trim().optional(),
-  category: z.string().optional(),
-  status: z.enum(["draft", "active", "hidden"]).optional(),
-  page: z.coerce.number().int().min(1).default(1),
+  q: z.string().trim().optional().catch(undefined),
+  category: z.string().trim().optional().catch(undefined),
+  status: z.enum(["draft", "active", "hidden"]).optional().catch(undefined),
+  page: z.coerce.number().int().min(1).default(1).catch(1),
 });
 
 export type ProductCreateInput = z.infer<typeof productCreateSchema>;

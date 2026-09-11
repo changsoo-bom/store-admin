@@ -1,7 +1,21 @@
-import { PagePlaceholder } from "@/app/_components/PagePlaceholder";
+import { ProductFilter } from "@/components/product/list/ProductFilter";
+import { ProductList } from "@/components/product/list/ProductList";
+import { PageTitle } from "@/components/ui/PageTitle";
+import type { Product } from "@/db/schema";
+import { productListParamsSchema } from "@/lib/schemas/product";
 
 export const metadata = { title: "제품" };
 
-export default function Page() {
-  return <PagePlaceholder title="제품" plan="등록한 제품을 목록으로 보고 재고와 가격을 고친다." />;
+export default async function ProductsPage({ searchParams }: PageProps<"/products">) {
+  const params = productListParamsSchema.parse(await searchParams);
+  // ponytail: DB 가 아직 안 붙었다(.env.local 없음). 붙으면 lib/queries/product.ts 의 조회로 바꾼다
+  const products: Product[] = [];
+
+  return (
+    <>
+      <PageTitle>제품</PageTitle>
+      <ProductFilter params={params} />
+      <ProductList products={products} filtered={Boolean(params.q || params.category || params.status)} />
+    </>
+  );
 }

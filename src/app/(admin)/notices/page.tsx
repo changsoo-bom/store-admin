@@ -1,7 +1,21 @@
-import { PagePlaceholder } from "@/app/_components/PagePlaceholder";
+import { NoticeFilter } from "@/components/notice/list/NoticeFilter";
+import { NoticeList } from "@/components/notice/list/NoticeList";
+import { PageTitle } from "@/components/ui/PageTitle";
+import { visibilityParamsSchema } from "@/lib/schemas/list";
+import type { NoticeRow } from "@/types/notice";
 
 export const metadata = { title: "공지사항" };
 
-export default function Page() {
-  return <PagePlaceholder title="공지사항" plan="고객에게 띄울 공지를 쓰고 노출 기간을 정한다." />;
+export default async function NoticesPage({ searchParams }: PageProps<"/notices">) {
+  const params = visibilityParamsSchema.parse(await searchParams);
+  // ponytail: notices 테이블이 아직 없다. 만들면 lib/queries/notice.ts 의 조회로 바꾼다
+  const notices: NoticeRow[] = [];
+
+  return (
+    <>
+      <PageTitle>공지사항</PageTitle>
+      <NoticeFilter params={params} />
+      <NoticeList notices={notices} filtered={Boolean(params.q || params.visible)} />
+    </>
+  );
 }
