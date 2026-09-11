@@ -137,9 +137,12 @@ textarea {
   background-clip: content-box;
 }
 
-:focus-visible {
-  outline: 2px solid var(--brand-blue);
-  outline-offset: 2px;
+/* base 레이어에 둔다. 레이어 밖에 두면 입력칸이 자기 포커스 링으로 덮을 수 없다 */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--brand-blue);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

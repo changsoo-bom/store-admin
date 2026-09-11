@@ -96,6 +96,19 @@ const theme = themeQuartz.withParams({
   headerColumnResizeHandleColor: "transparent",
   cellHorizontalPadding: 20,
   wrapperBorderRadius: 16,
+  // 페이지 크기 선택과 페이지 번호 칸도 검색 영역 입력칸과 같은 모양으로
+  inputBackgroundColor: "var(--surface)",
+  inputBorder: { color: "var(--hairline)" },
+  inputBorderRadius: 8,
+  inputFocusBackgroundColor: "var(--canvas)",
+  inputFocusBorder: { color: "var(--brand-blue)" },
+  inputFocusShadow: "0 0 0 1px var(--brand-blue)",
+  inputPlaceholderTextColor: "var(--steel)",
+  pickerButtonBackgroundColor: "var(--surface)",
+  pickerButtonBorder: { color: "var(--hairline)" },
+  pickerButtonBorderRadius: 8,
+  pickerButtonFocusBorder: { color: "var(--brand-blue)" },
+  pickerListBorder: { color: "var(--hairline)" },
 });
 
 const localeText = {

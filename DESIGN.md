@@ -258,7 +258,22 @@ DataGrid      총 N건 + ag-grid
 ```
 
 **검색 영역**은 패널 모양(`rounded-panel`, `hairline`, 안쪽 20px)이다.
-라벨은 13px `steel`, 입력칸은 38px `rounded-field` + `surface` 바탕, 포커스에서 `canvas` + `brand-blue` 테두리.
+라벨은 13px `steel`. 입력칸과 셀렉트는 38px `rounded-field` 로 같은 모양이다.
+글자칸은 왼쪽에 돋보기 16px, 셀렉트는 오른쪽에 `CaretDown` 14px. 둘 다 `steel`.
+브라우저 기본 셀렉트 화살표와 검색칸 지우기 버튼은 끈다.
+
+| 상태 | 바탕 | 테두리 | 글자 |
+|---|---|---|---|
+| 비어 있음 | `surface` | `hairline` | 자리 표시는 `steel`. 셀렉트의 '전체'도 `steel` |
+| 호버 | 그대로 | `hairline-strong` | |
+| **조건 걸림** | `canvas` | `hairline-strong` | `ink` |
+| 포커스 | `canvas` | `brand-blue` + 1px 링 | `ink` |
+| 비활성 | `hairline-soft` | `hairline-soft` | `steel` |
+
+**조건 걸림을 빈 칸과 다르게 그린다.** 목록을 보다가 어떤 조건이 걸려 있는지 칸만 훑어도 알 수 있어야 한다.
+포커스 링은 한 겹이다. 전역 `:focus-visible` 윤곽선은 `@layer base` 에 있어서 입력칸이 `outline-hidden` 으로 덮는다.
+ag-grid 의 페이지 크기 선택과 페이지 번호 칸도 같은 바탕·테두리·모서리를 쓴다.
+
 버튼은 초기화(secondary)와 검색(primary). 767px 이하에서는 칸이 한 줄씩 쌓이고 두 버튼이 반씩 나눈다.
 조건은 GET 으로 URL 에 남는다. 클라이언트 state 로 들고 있지 않는다.
 
