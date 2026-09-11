@@ -5,6 +5,9 @@ import { AllCommunityModule, themeQuartz } from "ag-grid-community";
 import type { ColDef, ColTypeDef, ValueFormatterParams } from "ag-grid-community";
 import { AgGridProvider, AgGridReact } from "ag-grid-react";
 import type { CustomCellRendererProps, CustomNoRowsOverlayProps } from "ag-grid-react";
+import { useRef, useState } from "react";
+
+import { Pagination } from "@/components/ui/Pagination";
 
 /**
  * 목록 화면의 표. 컬럼 정의는 서버 컴포넌트에서 넘어오므로 함수를 담을 수 없다.
@@ -96,37 +99,15 @@ const theme = themeQuartz.withParams({
   headerColumnResizeHandleColor: "transparent",
   cellHorizontalPadding: 20,
   wrapperBorderRadius: 16,
-  // 페이지 크기 선택과 페이지 번호 칸도 검색 영역 입력칸과 같은 모양으로
-  inputBackgroundColor: "var(--surface)",
-  inputBorder: { color: "var(--hairline)" },
-  inputBorderRadius: 8,
-  inputFocusBackgroundColor: "var(--canvas)",
-  inputFocusBorder: { color: "var(--brand-blue)" },
-  inputFocusShadow: "0 0 0 1px var(--brand-blue)",
-  inputPlaceholderTextColor: "var(--steel)",
-  pickerButtonBackgroundColor: "var(--surface)",
-  pickerButtonBorder: { color: "var(--hairline)" },
-  pickerButtonBorderRadius: 8,
-  pickerButtonFocusBorder: { color: "var(--brand-blue)" },
-  pickerListBorder: { color: "var(--hairline)" },
 });
 
 const localeText = {
   noRowsToShow: "보여줄 항목이 없다",
   loadingOoo: "불러오는 중",
-  page: "페이지",
-  of: "/",
-  to: "~",
-  more: "이상",
-  firstPage: "첫 페이지",
-  previousPage: "이전 페이지",
-  nextPage: "다음 페이지",
-  lastPage: "마지막 페이지",
-  pageSizeSelectorLabel: "페이지당",
-  ariaPageSizeSelectorLabel: "페이지당 행 수",
 };
 
 const modules = [AllCommunityModule];
+const PAGE_SIZES = [20, 50, 100];
 
 type Props<T> = {
   rows: T[];
@@ -138,6 +119,12 @@ type Props<T> = {
 };
 
 export function DataGrid<T>({ rows, columns, emptyTitle, emptyHint }: Props<T>) {
+  const gridRef = useRef<AgGridReact<T>>(null);
+  const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
+  // 페이지는 그리드가 들고 있다. 여기 둘은 그리드가 알려 주는 값을 그리기 위한 사본이다
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   return (
     <section className="flex flex-col gap-2">
       <p className="text-[13px] text-steel">
@@ -146,6 +133,7 @@ export function DataGrid<T>({ rows, columns, emptyTitle, emptyHint }: Props<T>) 
       <AgGridProvider modules={modules}>
         {/* ponytail: 페이지를 클라이언트에서 나눈다. 수천 건을 넘기면 searchParams 의 page 로 서버에서 자른다 */}
         <AgGridReact<T>
+          ref={gridRef}
           theme={theme}
           rowData={rows}
           columnDefs={columns as ColDef<T>[]}
@@ -154,12 +142,24 @@ export function DataGrid<T>({ rows, columns, emptyTitle, emptyHint }: Props<T>) 
           localeText={localeText}
           domLayout="autoHeight"
           pagination
-          paginationPageSize={20}
-          paginationPageSizeSelector={[20, 50, 100]}
+          paginationPageSize={pageSize}
+          suppressPaginationPanel
+          onPaginationChanged={(e) => {
+            setPage(e.api.paginationGetCurrentPage());
+            setTotalPages(e.api.paginationGetTotalPages());
+          }}
           noRowsOverlayComponent={Empty}
           noRowsOverlayComponentParams={{ title: emptyTitle, hint: emptyHint }}
         />
       </AgGridProvider>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={(p) => gridRef.current?.api.paginationGoToPage(p)}
+        pageSize={pageSize}
+        pageSizes={PAGE_SIZES}
+        onPageSizeChange={setPageSize}
+      />
     </section>
   );
 }

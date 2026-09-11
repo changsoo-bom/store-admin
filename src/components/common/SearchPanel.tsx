@@ -1,8 +1,10 @@
-import { CaretDown, MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
+import { CaretDown } from "@phosphor-icons/react/dist/ssr";
 import Form from "next/form";
 import Link from "next/link";
 import { Children } from "react";
 import type { ReactNode } from "react";
+
+import { fieldClass } from "@/components/ui/field-class";
 
 type PanelProps = {
   /** 목록 경로. 검색은 여기로 GET 을 보내고 초기화는 여기로 돌아온다 */
@@ -71,15 +73,7 @@ export function SearchPanel({ action, children }: PanelProps) {
   );
 }
 
-/**
- * 네 상태를 칸 모양으로 구분한다.
- * 비어 있음  surface 바탕, hairline 테두리
- * 조건 걸림  canvas 바탕, hairline-strong 테두리. 어떤 조건이 걸렸는지 훑어서 보인다
- * 포커스     canvas 바탕, brand-blue 테두리 + 1px 링. 바깥 윤곽선은 겹치지 않게 끈다
- * 비활성     hairline-soft 바탕, steel 글자
- */
-const fieldClass =
-  "h-[38px] w-full cursor-pointer appearance-none rounded-field border border-hairline bg-surface text-sm text-ink outline-hidden transition-[background-color,border-color,box-shadow] duration-150 ease-brand hover:border-hairline-strong focus:border-brand-blue focus:bg-canvas focus:shadow-[0_0_0_1px_var(--brand-blue)] disabled:cursor-not-allowed disabled:border-hairline-soft disabled:bg-hairline-soft disabled:text-steel";
+// 조건이 걸린 칸은 canvas 바탕 + hairline-strong 테두리로 빈 칸과 구분한다. 어떤 조건이 걸렸는지 훑어서 보인다
 
 type FieldProps = { label: string; name: string; defaultValue?: string };
 
@@ -105,14 +99,13 @@ function Field({ label, name, children }: { label: string; name: string; childre
 export function SearchText({ label, name, defaultValue, placeholder }: FieldProps & { placeholder: string }) {
   return (
     <Field label={label} name={name}>
-      <MagnifyingGlass size={16} aria-hidden className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2" />
       <input
         id={idOf(name)}
         type="search"
         name={name}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className={`${fieldClass} cursor-text pr-3 pl-9 placeholder:text-steel not-placeholder-shown:border-hairline-strong
+        className={`${fieldClass} cursor-text px-3 placeholder:text-steel not-placeholder-shown:border-hairline-strong
           not-placeholder-shown:bg-canvas [&::-webkit-search-cancel-button]:appearance-none`}
       />
     </Field>
