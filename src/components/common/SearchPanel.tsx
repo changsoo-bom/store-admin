@@ -49,7 +49,7 @@ export function SearchPanel({ action, children }: PanelProps) {
         </table>
       </div>
 
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-end gap-2">
         <Link
           href={action}
           className="inline-flex min-h-[38px] min-w-24 items-center justify-center rounded-full border

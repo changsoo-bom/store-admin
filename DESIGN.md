@@ -253,7 +253,7 @@ Outfit 은 라틴 글자만 커버한다. **한글은 Pretendard 로 떨어진�
 
 ```
 PageTitle     28px 제목
-SearchPanel   검색 표 + 가운데 정렬 버튼
+SearchPanel   검색 표 + 오른쪽 정렬 버튼
 DataGrid      총 N건 + ag-grid
 ```
 
@@ -265,7 +265,7 @@ DataGrid      총 N건 + ag-grid
 ├──────────┼────────────────────┼──────────┴────────────────────┤
 │ 상태      │ [ 전체           v ] │                               │
 └──────────┴────────────────────┴───────────────────────────────┘
-                     ( 초기화 )  ( 검색 )
+                                                 ( 초기화 )  ( 검색 )
 ```
 
 - 바깥은 `rounded-panel` + `hairline`. 줄 사이와 두 번째 쌍 앞은 `hairline-soft` 1px
@@ -290,7 +290,7 @@ DataGrid      총 N건 + ag-grid
 포커스 링은 한 겹이다. 전역 `:focus-visible` 윤곽선은 `@layer base` 에 있어서 입력칸이 `outline-hidden` 으로 덮는다.
 ag-grid 의 페이지 크기 선택과 페이지 번호 칸도 같은 바탕·테두리·모서리를 쓴다.
 
-버튼은 표 아래 가운데에 초기화(secondary)와 검색(primary). 767px 이하에서는 두 버튼이 폭을 반씩 나눈다.
+버튼은 표 아래 오른쪽 끝에 초기화(secondary)와 검색(primary). 767px 이하에서는 두 버튼이 폭을 반씩 나눈다.
 조건은 GET 으로 URL 에 남는다. 클라이언트 state 로 들고 있지 않는다.
 
 **표는 ag-grid 다.** `components/common/DataGrid.tsx` 의 Quartz 테마가 위 표 규칙을 옮긴 것이다.
