@@ -9,7 +9,7 @@ function toKrw(v: string | number, ctx: z.RefinementCtx): number {
   const n = typeof v === "number" ? v : Number(v.replace(/[^0-9]/g, ""));
   if (!Number.isFinite(n) || n < 0) {
     // transform 안에서 throw 하면 safeParse 가 터진다
-    ctx.addIssue({ code: "custom", message: "금액을 숫자로 입력해주세요" });
+    ctx.addIssue({ code: "custom", message: "금액을 숫자로 입력해 주세요" });
     return z.NEVER;
   }
   return Math.trunc(n);
@@ -21,8 +21,8 @@ const krwOrZero = rawKrw.default(0).transform(toKrw);
 
 /** DB 스키마에서 뽑고, 폼이 실제로 보내는 것만 남긴다 */
 export const productCreateSchema = createInsertSchema(products, {
-  name: z.string().min(1, "상품명을 입력해주세요").max(60),
-  category: z.string().min(1, "카테고리를 선택해주세요"),
+  name: z.string().min(1, "제품명을 입력해 주세요").max(60),
+  category: z.string().min(1, "카테고리를 선택해 주세요"),
   description: z.string().max(120).optional(),
 })
   .pick({ name: true, brand: true, category: true, description: true, status: true })
@@ -33,7 +33,7 @@ export const productCreateSchema = createInsertSchema(products, {
   });
 
 export const variantCreateSchema = createInsertSchema(productVariants, {
-  sku: z.string().min(1, "SKU 를 입력해주세요").max(40),
+  sku: z.string().min(1, "SKU 를 입력해 주세요").max(40),
 })
   .pick({ sizeOz: true, color: true, sku: true })
   .extend({
@@ -42,7 +42,7 @@ export const variantCreateSchema = createInsertSchema(productVariants, {
   });
 
 export const productWithVariantsSchema = productCreateSchema.extend({
-  variants: z.array(variantCreateSchema).min(1, "옵션을 하나 이상 추가해주세요"),
+  variants: z.array(variantCreateSchema).min(1, "옵션을 하나 이상 추가해 주세요"),
 });
 
 /** 목록 화면의 searchParams. 비운 값과 잘못된 값은 조건 없음으로 본다 */

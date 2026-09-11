@@ -13,7 +13,7 @@ export function PagePlaceholder({ title, plan }: Props) {
       <PageTitle>{title}</PageTitle>
 
       <div className="rounded-panel border border-hairline bg-canvas p-10 text-center">
-        <p className="font-display text-[17px] font-medium">아직 화면이 없다</p>
+        <p className="font-display text-[17px] font-medium">아직 준비 중인 화면입니다</p>
         <p className="mt-1 text-steel">{plan}</p>
       </div>
     </>

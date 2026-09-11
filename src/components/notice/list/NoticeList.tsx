@@ -21,8 +21,8 @@ export function NoticeList({ notices, filtered }: { notices: NoticeRow[]; filter
     <DataGrid
       rows={notices}
       columns={columns}
-      emptyTitle={filtered ? "조건에 맞는 공지사항이 없다" : "공지사항이 없다"}
-      emptyHint={filtered ? "검색어를 줄이거나 노출을 전체로 바꿔서 다시 찾는다." : "첫 공지사항을 쓰면 여기에 쌓인다."}
+      emptyTitle={filtered ? "조건에 맞는 공지사항이 없습니다" : "등록된 공지사항이 없습니다"}
+      emptyHint={filtered ? "검색어를 줄이거나 노출을 전체로 바꿔서 다시 찾아 주세요." : "첫 공지사항을 작성하면 여기에 쌓입니다."}
     />
   );
 }

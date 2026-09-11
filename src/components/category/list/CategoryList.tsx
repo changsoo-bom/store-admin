@@ -13,8 +13,8 @@ export function CategoryList({ categories, filtered }: { categories: CategorySum
     <DataGrid
       rows={categories}
       columns={columns}
-      emptyTitle={filtered ? "조건에 맞는 카테고리가 없다" : "카테고리가 없다"}
-      emptyHint={filtered ? "검색어를 줄여서 다시 찾는다." : "제품을 등록할 때 정한 카테고리가 여기에 모인다."}
+      emptyTitle={filtered ? "조건에 맞는 카테고리가 없습니다" : "등록된 카테고리가 없습니다"}
+      emptyHint={filtered ? "검색어를 줄여서 다시 찾아 주세요." : "제품을 등록할 때 정한 카테고리가 여기에 모입니다."}
     />
   );
 }

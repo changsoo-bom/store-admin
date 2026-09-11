@@ -102,7 +102,7 @@ const theme = themeQuartz.withParams({
 });
 
 const localeText = {
-  noRowsToShow: "보여줄 항목이 없다",
+  noRowsToShow: "보여줄 항목이 없습니다",
   loadingOoo: "불러오는 중",
 };
 

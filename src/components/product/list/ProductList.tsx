@@ -26,8 +26,8 @@ export function ProductList({ products, filtered }: { products: Product[]; filte
     <DataGrid
       rows={products}
       columns={columns}
-      emptyTitle={filtered ? "조건에 맞는 제품이 없다" : "등록한 제품이 없다"}
-      emptyHint={filtered ? "검색어를 줄이거나 상태를 전체로 바꿔서 다시 찾는다." : "오른쪽 위 제품 등록에서 첫 제품을 올린다."}
+      emptyTitle={filtered ? "조건에 맞는 제품이 없습니다" : "등록된 제품이 없습니다"}
+      emptyHint={filtered ? "검색어를 줄이거나 상태를 전체로 바꿔서 다시 찾아 주세요." : "오른쪽 위 제품 등록에서 첫 제품을 올려 주세요."}
     />
   );
 }
