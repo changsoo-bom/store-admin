@@ -1,4 +1,5 @@
 import { Header } from "@/app/_components/Header";
+import { PageTransition } from "@/app/_components/PageTransition";
 import { Lnb } from "@/app/_components/Lnb";
 
 export default function AdminLayout({ children }: LayoutProps<"/">) {
@@ -7,8 +8,8 @@ export default function AdminLayout({ children }: LayoutProps<"/">) {
       <Lnb />
       <div className="flex min-w-0 flex-col">
         <Header />
-        <main className="flex flex-1 flex-col gap-5 p-6 max-md:gap-3 max-md:p-4">
-          {children}
+        <main className="flex flex-1 flex-col p-6 max-md:p-4">
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
     </div>

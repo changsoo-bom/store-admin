@@ -343,13 +343,26 @@ DataGrid      총 N건 + 페이지 크기 선택 / ag-grid / 페이지 번호
 
 ## 모션
 
-전환 **160ms**, 이징 `cubic-bezier(.2,.8,.3,1)` (`ease-brand`).
+이징은 `ease-brand`(`cubic-bezier(.2,.8,.3,1)`) 하나다. **등장에 `ease-in` 을 쓰지 않는다.**
+관리자는 이 화면을 하루에 수십 번 본다. 그래서 길이는 전부 300ms 아래, 대부분 200ms 아래다.
 
-움직이는 것은 셋뿐이다.
+| 무엇 | 길이 | 속성 | 이유 |
+|---|---|---|---|
+| 호버 배경색 | 120~160ms | `background-color` | 피드백 |
+| 버튼 누름 | 즉시 | `scale(.98)` | 피드백 |
+| 라우트 전환 | 140ms | `opacity` + `translateY(4px)` | 화면이 통째로 갈리는 걸 눕힌다 |
+| 스켈레톤 | 1.4s 반복 | `opacity` | 기다리는 중이라는 표시 |
+| 빈 상태 등장 | 200ms | `opacity` + `translateY` | 표가 비었다는 걸 덜 갑작스럽게 |
+| 스티키노트 떠오름 | 180ms | `transform` + `box-shadow` | 시그니처 |
 
-- 호버 배경색
-- 버튼 누름 `scale(.98)`
-- 스티키노트 떠오름
+**`transform` 과 `opacity` 만 움직인다.** `width`, `height`, `top` 은 매 프레임 레이아웃을 다시 잰다.
+
+**표 행에 등장 애니메이션을 넣지 않는다.** ag-grid 는 스크롤하면 행 요소를 재사용해서
+등장이 스크롤 중에 다시 터진다. 읽는 중인 데이터는 가만히 둔다.
+
+**ag-grid 기본 호버 하이라이트는 끈다**(`suppressRowHoverHighlight`). 켜졌다 꺼지는 겹층이라
+전환이 안 걸린다. 호버 색은 `globals.css` 에서 행에 직접 칠하고, 손가락 입력에서는
+탭이 호버로 남지 않게 `@media (hover: hover)` 로 막는다.
 
 **`prefers-reduced-motion: reduce` 에서 전부 멈춘다.** 전역에 걸려 있다.
 

@@ -144,6 +144,8 @@ export function DataGrid<T>({ rows, columns, emptyTitle, emptyHint }: Props<T>) 
           defaultColDef={defaultColDef}
           localeText={localeText}
           domLayout="autoHeight"
+          // 기본 호버는 켜졌다 꺼지는 겹층이라 전환이 안 걸린다. globals.css 에서 직접 칠한다
+          suppressRowHoverHighlight
           pagination
           paginationPageSize={pageSize}
           suppressPaginationPanel
