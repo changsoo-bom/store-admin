@@ -33,22 +33,30 @@ pnpm db:studio        # 브라우저 DB 뷰어
 
 ## 워크트리
 
-**브랜치를 바꾸지 않고 옆에 디렉터리를 판다.** 규칙은 Obsidian `개발-공통규칙/git-worktree.md`.
+**브랜치를 바꾸지 않고 저장소 바깥에 디렉터리를 판다.** 규칙은 Obsidian `개발-공통규칙/git-worktree.md`.
 
 **`feat` 이나 `fix` 성격의 작업은 본체에서 시작하지 않는다.** 워크트리를 먼저 파고 거기서 작업한다.
 본체 `main` 은 항상 깨끗한 상태로 둔다. 오타 수정이나 문서 한 줄처럼 커밋 하나로 끝나는 건 예외다.
 
-구조는 형제 디렉터리 방식이다. bare 패턴은 쓰지 않는다.
+워크트리는 **플랫폼별 루트 아래 프로젝트 이름으로 한 단계 내려간 곳**에 만든다.
+본체 옆에 형제로 두지 않는다. bare 패턴도 쓰지 않는다.
+
+| 플랫폼 | 루트 |
+|---|---|
+| Windows | `C:\workspace\.boxingstore-worktrees\store-admin\` |
+| macOS / Linux | `~/.boxingstore-worktrees/store-admin/` |
 
 ```
-C:\workspace\BoxingStore\
-├── store-admin/                 ← 본체, main 이 항상 여기 체크아웃돼 있다
-├── store-admin-variant-stock/   ← wt.sh add 로 생긴다
-└── store-admin-hotfix/
+C:\workspace\
+├── BoxingStore\store-admin\          ← 본체, main 이 항상 여기 체크아웃돼 있다
+└── .boxingstore-worktrees\
+    └── store-admin\
+        ├── variant-stock\            ← wt.sh add 로 생긴다
+        └── hotfix\
 ```
 
 ```bash
-./scripts/wt.sh add   fix/variant-stock   # ../store-admin-variant-stock 을 만들고 pnpm install 까지
+./scripts/wt.sh add   fix/variant-stock   # <루트>/store-admin/variant-stock 을 만들고 pnpm install 까지
 ./scripts/wt.sh close fix/variant-stock   # main 으로 ff-머지한 뒤 워크트리와 브랜치 삭제
 ./scripts/wt.sh ls
 ```
@@ -64,6 +72,9 @@ gitignore 대상이라 따라오지 않는 `.env.local` 과 `.claude/settings.lo
 ff 가 안 되면 그 자리에서 멈춘다. rebase 하라는 신호다.
 정리는 `git worktree remove` 가 아니라 디렉터리를 직접 지우고 `prune` 한다.
 `remove` 는 `node_modules` 를 못 지워서 항상 `Directory not empty` 로 실패한다.
+마지막 워크트리를 지우면 빈 프로젝트 디렉터리와 루트도 같이 치운다.
+
+루트를 바꾸려면 `WT_ROOT=/다른/경로 ./scripts/wt.sh add ...` 처럼 앞에 붙인다.
 
 **`node_modules` 를 심링크로 공유하지 않는다.** pnpm 은 전역 스토어에서 하드링크로 붙어서
 워크트리마다 `pnpm install` 하는 게 더 빠르고 안전하다. 디스크도 거의 안 먹는다.

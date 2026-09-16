@@ -14,6 +14,14 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 NAME="$(basename "$ROOT")"
 BASE="${WT_BASE:-main}"
 
+# 워크트리는 저장소 옆이 아니라 플랫폼별 루트 아래, 프로젝트 이름으로 한 단계 내려간 곳에 판다.
+# 루트를 여러 저장소가 같이 쓰므로 프로젝트 단계가 없으면 워크트리 이름이 부딪힌다.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) DEFAULT_ROOT="/c/workspace/.boxingstore-worktrees" ;;
+  *) DEFAULT_ROOT="$HOME/.boxingstore-worktrees" ;;
+esac
+WT_ROOT="${WT_ROOT:-$DEFAULT_ROOT}"
+
 # gitignore 대상이라 새 워크트리에 안 따라오는 것들
 CARRY=(".env.local" ".claude/settings.local.json")
 
@@ -28,12 +36,13 @@ usage() {
   ./scripts/wt.sh add   fix/variant-stock
   ./scripts/wt.sh close fix/variant-stock
 
-베이스 브랜치를 바꾸려면 WT_BASE=release/v1.x 를 앞에 붙인다.
+베이스 브랜치를 바꾸려면 WT_BASE=release/v1.x 를, 워크트리 루트를 바꾸려면
+WT_ROOT=/다른/경로 를 앞에 붙인다.
 EOF
 }
 
-# fix/variant-stock -> ../store-admin-variant-stock
-dir_for() { printf '%s/../%s-%s' "$ROOT" "$NAME" "${1##*/}"; }
+# fix/variant-stock -> <루트>/store-admin/variant-stock
+dir_for() { printf '%s/%s/%s' "$WT_ROOT" "$NAME" "${1##*/}"; }
 
 case "${1:-}" in
 
@@ -53,6 +62,7 @@ add)
     START="$BASE"
     EXTRA=""
   fi
+  mkdir -p "$(dirname "$DIR")"
   git -C "$ROOT" worktree add "$DIR" -b "$BR" "$START" $EXTRA
 
   for f in "${CARRY[@]}"; do
@@ -102,6 +112,8 @@ close)
     echo "머지는 끝났으니 정리한 뒤 close 를 다시 실행하면 이어서 지운다." >&2
     exit 1
   fi
+  rmdir "$WT_ROOT/$NAME" 2>/dev/null || true
+  rmdir "$WT_ROOT" 2>/dev/null || true
   git -C "$ROOT" worktree prune
   git -C "$ROOT" branch -d "$BR"
 
