@@ -51,8 +51,8 @@ C:\workspace\
 ├── BoxingStore\store-admin\          ← 본체, main 이 항상 여기 체크아웃돼 있다
 └── .boxingstore-worktrees\
     └── store-admin\
-        ├── variant-stock\            ← wt.sh add 로 생긴다
-        └── hotfix\
+        ├── agumon\                   ← wt.sh add 로 생긴다
+        └── gabumon\
 ```
 
 **이름은 디지몬으로 짓는다.** 이 프로젝트만의 규칙이다 (Obsidian 공통 문서는 `<type>/<무엇>`).
