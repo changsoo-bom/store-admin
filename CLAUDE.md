@@ -55,9 +55,12 @@ C:\workspace\
         └── hotfix\
 ```
 
+**이름은 디지몬으로 짓는다.** 이 프로젝트만의 규칙이다 (Obsidian 공통 문서는 `<type>/<무엇>`).
+브랜치 이름이 곧 디렉터리 이름이 된다. 만들기 전에 `./scripts/wt.sh ls` 와 `git branch` 로 겹치는 이름을 피한다.
+
 ```bash
-./scripts/wt.sh add   fix/variant-stock   # <루트>/store-admin/variant-stock 을 만들고 pnpm install 까지
-./scripts/wt.sh close fix/variant-stock   # main 으로 ff-머지한 뒤 워크트리와 브랜치 삭제
+./scripts/wt.sh add   agumon   # <루트>/store-admin/agumon 을 만들고 pnpm install 까지
+./scripts/wt.sh close agumon   # main 으로 ff-머지한 뒤 워크트리와 브랜치 삭제
 ./scripts/wt.sh ls
 ```
 
